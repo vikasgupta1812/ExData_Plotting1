@@ -1,0 +1,55 @@
+#Download the file
+fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+
+if (!file.exists("Dataset.zip")) {
+  download.file(fileUrl, destfile = "Dataset.zip", method = "wget")
+}
+
+
+#Unzip the file.
+if (!file.exists("household_power_consumption.txt")) {
+  unzip("Dataset.zip", overwrite = TRUE)
+}
+
+#Load data from file
+#df  <-  read.table('household_power_consumption.txt',header=T,sep=";",na.strings="?",nrows=10)
+df  <-  read.table('household_power_consumption.txt',header=T,sep=";",na.strings="?")
+
+#Convert date  to date classes using as.Date() function
+df$Date  <- as.Date(df$Date,"%d/%m/%Y")
+
+#dates for which the data is needed  2007-02-01 and 2007-02-02
+dates  <- c("2007-02-01","2007-02-02")
+dates  <- as.Date(dates)
+
+#Take Subset of the dataset for specified dates
+df1  <- subset(df,Date %in% dates)
+#rm(df)
+
+#Add the datetime column using Date & Time Columnns
+#Code adaptes fom [StackOverflow Post](http://stackoverflow.com/a/5251189/2356016)
+
+df1 <- within(df1, Datetime <- strptime(paste(as.character(df1$Date), df1$Time), format="%Y-%m-%d %H:%M:%S"))
+
+
+#Plot the Graphs 
+#========================================================
+#Plot1: Histogram distribution of Global Active Power
+png(filename = "plot4.png",width = 480, height = 480, units = "px")
+par(mfrow=c(2,2))
+
+plot(df1$Datetime,df1$Global_active_power,type = "l",
+     ylab = "Global Active Power (kilowatts)",xlab = "")
+
+plot(df1$Datetime,df1$Voltage,type = "l",
+     ylab = "Voltage",xlab = "datetime")
+
+plot(df1$Datetime, df1$Sub_metering_1,type="l",ylab="Energy sub metering",xlab="")
+lines(df1$Datetime, df1$Sub_metering_2,col="red")
+lines(df1$Datetime, df1$Sub_metering_3,col="blue")
+legend("topright",legend = names(df1)[7:9],lty = 1, col=c("black","red","blue"))
+
+
+plot(df1$Datetime,df1$Global_reactive_power,type = "l",
+     ylab = "Global_reactive_power",xlab = "datetime")
+dev.off()
