@@ -38,5 +38,4 @@ df1 <- within(df1, Datetime <- strptime(paste(as.character(df1$Date), df1$Time),
 png(filename = "plot1.png",width = 480, height = 480, units = "px")
 par(mfrow=c(1,1))
 hist(df1[,3],col = "red", main = "Global Active Power", xlab = "Global Active Power (kilowatts)", ylim = range(0,1200))
-#dev.copy(png, filename = "plot1.png",width = 480, height = 480, units = "px")
 dev.off()
